@@ -1,6 +1,9 @@
+import os
+
 import requests
 import lxml
 from bs4 import BeautifulSoup
+import smtplib
 
 url = "https://www.amazon.com/Duo-Evo-Plus-esterilizadora-vaporizador/dp/B07W55DDFB/ref=sr_1_4?qid=1597660904"
 header = {
@@ -17,3 +20,20 @@ price = soup.find(id="priceblock_ourprice").get_text()
 price_without_currency = price.split("$")[1]
 price_as_float = float(price_without_currency)
 print(price_as_float)
+
+title = soup.find(id="productTitle").get_text().strip()
+print(title)
+
+budget = 200
+
+if price_as_float < budget:
+    message = f"{title} is now {price}"
+
+    with smtplib.SMTP(os.getenv("SMTP_ADDRESS"), port=587) as connection:
+        connection.starttls()
+        result = connection.login(os.getenv("SMTP_EMAIL"), os.getenv("SMTP_PASSWORD"))
+        connection.sendmail(
+            from_addr=os.getenv("SMTP_EMAIL"),
+            to_addrs=os.getenv("SMTP_TO_EMAIL"),
+            msg=f"Subject:Amazon Price Alert!\n\n{message}\n{url}"
+        )
