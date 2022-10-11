@@ -18,15 +18,15 @@ print(soup.prettify())
 
 price = soup.find(id="priceblock_ourprice").get_text()
 price_without_currency = price.split("$")[1]
-price_as_float = float(price_without_currency)
-print(price_as_float)
+actual_price = float(price_without_currency)
+print(actual_price)
 
 title = soup.find(id="productTitle").get_text().strip()
 print(title)
 
 budget = 200
 
-if price_as_float < budget:
+if actual_price < budget:
     message = f"{title} is now {price}"
 
     with smtplib.SMTP(os.getenv("SMTP_ADDRESS"), port=587) as connection:
