@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import requests
 from bs4 import BeautifulSoup
 import spotipy
@@ -23,7 +21,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv("CLIENT_ID"),
                                                redirect_uri="http://example.com",
                                                scope="playlist-modify-private"))
 user_id = sp.current_user()["id"]
-# print(user_id)
+
 
 song_year = year.split("-")[0]
 
