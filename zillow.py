@@ -26,14 +26,21 @@ class ZillowBot:
         soup = BeautifulSoup(data, 'html.parser')
         unorderd_list = soup.find(name="ul", class_="with_constellation")
         listed_items = unorderd_list.find_all("li")
-        #print(listed_items[1])
+
         for item in listed_items:
-            #print(item)
-            if item is not None:
-                url = item.find(name="a")['href']
-                property = item.find(name="img")['alt']
-                price = item.find(name="span").getText()
+            # print(item)
+            try:
+                article = item.find(name="article")
+                p_data = article.find(name="div", class_="property-card-data")
+                print(p_data)
+                url = p_data.find(name="a")['href']
+                property = p_data.find(name="address").getText()
+                price = p_data.find(name="span").getText()
+                print(url, property, price)
+
                 extracted_items.append({'name': property, 'price': price, 'link': url})
+            except AttributeError:
+                pass
 
         return extracted_items
 
