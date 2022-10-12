@@ -4,6 +4,8 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 import requests
 from pprint import pprint
+import os
+import time
 
 chrome_driver_path = "/Users/adu/development/selenium/chromedriver"
 
@@ -12,7 +14,7 @@ class ZillowBot:
 
     def __init__(self, path):
         self.path = path
-        # self.driver = webdriver.Chrome(executable_path=self.path)
+        self.driver = webdriver.Chrome(executable_path=self.path)
 
     def extract_data(self):
         header = {
@@ -32,11 +34,11 @@ class ZillowBot:
             try:
                 article = item.find(name="article")
                 p_data = article.find(name="div", class_="property-card-data")
-                print(p_data)
+
                 url = p_data.find(name="a")['href']
                 property = p_data.find(name="address").getText()
                 price = p_data.find(name="span").getText()
-                print(url, property, price)
+
 
                 extracted_items.append({'name': property, 'price': price, 'link': url})
             except AttributeError:
@@ -44,9 +46,24 @@ class ZillowBot:
 
         return extracted_items
 
-    def fill_form(self):
-        pass
+    def fill_form(self, data):
+        for item in data:
+            self.driver.get(os.getenv("FORM_URL"))
+            time.sleep(2)
+            inputs = self.driver.find_elements(By.XPATH,  "//input[@type='text']")
+            #print(inputs)
+            inputs[0].send_keys(item['name'])
+            inputs[1].send_keys(item['link'])
+            inputs[2].send_keys(item['price'])
+
+            button = self.driver.find_element(By.CSS_SELECTOR, "span.NPEfkd.RveJvd.snByac")
+            button.click()
+
 
 
 zw = ZillowBot(path=chrome_driver_path)
-print(zw.extract_data())
+data = zw.extract_data()
+if len(data) > 0:
+    filled = zw.fill_form(data)
+
+
